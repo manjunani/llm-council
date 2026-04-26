@@ -6,9 +6,7 @@ from .config import OPENROUTER_API_KEY, OPENROUTER_API_URL
 
 
 async def query_model(
-    model: str,
-    messages: List[Dict[str, str]],
-    timeout: float = 120.0
+    model: str, messages: List[Dict[str, str]], timeout: float = 120.0
 ) -> Optional[Dict[str, Any]]:
     """
     Query a single model via OpenRouter API.
@@ -19,7 +17,7 @@ async def query_model(
         timeout: Request timeout in seconds
 
     Returns:
-        Response dict with 'content' and optional 'reasoning_details', or None if failed
+        Response dict with 'content', 'reasoning_details', 'tokens', and 'cost', or None if failed
     """
     headers = {
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
@@ -34,18 +32,25 @@ async def query_model(
     try:
         async with httpx.AsyncClient(timeout=timeout) as client:
             response = await client.post(
-                OPENROUTER_API_URL,
-                headers=headers,
-                json=payload
+                OPENROUTER_API_URL, headers=headers, json=payload
             )
             response.raise_for_status()
 
             data = response.json()
-            message = data['choices'][0]['message']
+            message = data["choices"][0]["message"]
+            usage = data.get("usage", {})
 
             return {
-                'content': message.get('content'),
-                'reasoning_details': message.get('reasoning_details')
+                "content": message.get("content"),
+                "reasoning_details": message.get("reasoning_details"),
+                "tokens": {
+                    "input": usage.get("prompt_tokens", 0),
+                    "output": usage.get("completion_tokens", 0),
+                    "total": usage.get("total_tokens", 0),
+                },
+                "cost": data.get("usage", {}).get(
+                    "cost_usd", 0.0
+                ),  # OpenRouter may provide this
             }
 
     except Exception as e:
@@ -54,8 +59,7 @@ async def query_model(
 
 
 async def query_models_parallel(
-    models: List[str],
-    messages: List[Dict[str, str]]
+    models: List[str], messages: List[Dict[str, str]]
 ) -> Dict[str, Optional[Dict[str, Any]]]:
     """
     Query multiple models in parallel.

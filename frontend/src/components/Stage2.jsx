@@ -14,7 +14,7 @@ function deAnonymizeText(text, labelToModel) {
   return result;
 }
 
-export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
+export default function Stage2({ rankings, labelToModel, aggregateRankings, consensus }) {
   const [activeTab, setActiveTab] = useState(0);
 
   if (!rankings || rankings.length === 0) {
@@ -24,6 +24,31 @@ export default function Stage2({ rankings, labelToModel, aggregateRankings }) {
   return (
     <div className="stage stage2">
       <h3 className="stage-title">Stage 2: Peer Rankings</h3>
+
+      {/* Consensus Summary */}
+      {consensus && (
+        <div className="consensus-summary">
+          <div className="consensus-header">
+            <span className="consensus-title">Council Consensus</span>
+            <span className={`confidence-badge confidence-${consensus.confidence >= 0.8 ? 'high' : consensus.confidence >= 0.6 ? 'medium' : 'low'}`}>
+              {(consensus.confidence * 100).toFixed(0)}% Confident
+            </span>
+          </div>
+          <div className="consensus-details">
+            <span className="consensus-percentage">
+              {consensus.consensus_percentage}% Agreement on Best Response
+            </span>
+            {consensus.dissenting_views && consensus.dissenting_views.length > 0 && (
+              <span className="dissent-info">
+                {consensus.dissenting_views.length} alternative view{consensus.dissenting_views.length > 1 ? 's' : ''}
+              </span>
+            )}
+            {consensus.dissenting_views?.length === 0 && (
+              <span className="full-agreement">✓ Full Council Agreement</span>
+            )}
+          </div>
+        </div>
+      )}
 
       <h4>Raw Evaluations</h4>
       <p className="stage-description">

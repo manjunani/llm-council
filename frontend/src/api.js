@@ -67,6 +67,42 @@ export const api = {
   },
 
   /**
+   * Submit thumbs up/down feedback for an assistant message.
+   */
+  async submitFeedback(conversationId, messageIndex, rating, comment = '') {
+    const response = await fetch(
+      `${API_BASE}/api/conversations/${conversationId}/messages/${messageIndex}/feedback`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating, comment }),
+      }
+    );
+    if (!response.ok) throw new Error('Failed to submit feedback');
+    return response.json();
+  },
+
+  /**
+   * Search conversations by title or message content.
+   */
+  async searchConversations(query) {
+    const response = await fetch(
+      `${API_BASE}/api/conversations/search?q=${encodeURIComponent(query)}`
+    );
+    if (!response.ok) throw new Error('Failed to search conversations');
+    return response.json();
+  },
+
+  /**
+   * Get model performance leaderboard.
+   */
+  async getLeaderboard() {
+    const response = await fetch(`${API_BASE}/api/analytics/leaderboard`);
+    if (!response.ok) throw new Error('Failed to get leaderboard');
+    return response.json();
+  },
+
+  /**
    * Send a message and receive streaming updates.
    * @param {string} conversationId - The conversation ID
    * @param {string} content - The message content

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import ChatInterface from './components/ChatInterface';
+import Leaderboard from './components/Leaderboard';
 import { api } from './api';
 import './App.css';
 
@@ -9,13 +10,12 @@ function App() {
   const [currentConversationId, setCurrentConversationId] = useState(null);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
-  // Load conversations on mount
   useEffect(() => {
     loadConversations();
   }, []);
 
-  // Load conversation details when selected
   useEffect(() => {
     if (currentConversationId) {
       loadConversation(currentConversationId);
@@ -44,7 +44,7 @@ function App() {
     try {
       const newConv = await api.createConversation();
       setConversations([
-        { id: newConv.id, created_at: newConv.created_at, message_count: 0 },
+        { id: newConv.id, created_at: newConv.created_at, message_count: 0, title: 'New Conversation' },
         ...conversations,
       ]);
       setCurrentConversationId(newConv.id);
@@ -57,46 +57,46 @@ function App() {
     setCurrentConversationId(id);
   };
 
+  const handleFeedback = async (messageIndex, rating) => {
+    if (!currentConversationId) return;
+    try {
+      await api.submitFeedback(currentConversationId, messageIndex, rating);
+    } catch (error) {
+      console.error('Failed to submit feedback:', error);
+    }
+  };
+
   const handleSendMessage = async (content) => {
     if (!currentConversationId) return;
 
     setIsLoading(true);
     try {
-      // Optimistically add user message to UI
       const userMessage = { role: 'user', content };
       setCurrentConversation((prev) => ({
         ...prev,
         messages: [...prev.messages, userMessage],
       }));
 
-      // Create a partial assistant message that will be updated progressively
       const assistantMessage = {
         role: 'assistant',
         stage1: null,
         stage2: null,
         stage3: null,
         metadata: null,
-        loading: {
-          stage1: false,
-          stage2: false,
-          stage3: false,
-        },
+        loading: { stage1: false, stage2: false, stage3: false },
       };
 
-      // Add the partial assistant message
       setCurrentConversation((prev) => ({
         ...prev,
         messages: [...prev.messages, assistantMessage],
       }));
 
-      // Send message with streaming
       await api.sendMessageStream(currentConversationId, content, (eventType, event) => {
         switch (eventType) {
           case 'stage1_start':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage1 = true;
+              messages[messages.length - 1].loading.stage1 = true;
               return { ...prev, messages };
             });
             break;
@@ -104,9 +104,10 @@ function App() {
           case 'stage1_complete':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage1 = event.data;
-              lastMsg.loading.stage1 = false;
+              const last = messages[messages.length - 1];
+              last.stage1 = event.data;
+              last.stage1_tokens = event.tokens;
+              last.loading.stage1 = false;
               return { ...prev, messages };
             });
             break;
@@ -114,8 +115,7 @@ function App() {
           case 'stage2_start':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage2 = true;
+              messages[messages.length - 1].loading.stage2 = true;
               return { ...prev, messages };
             });
             break;
@@ -123,10 +123,11 @@ function App() {
           case 'stage2_complete':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage2 = event.data;
-              lastMsg.metadata = event.metadata;
-              lastMsg.loading.stage2 = false;
+              const last = messages[messages.length - 1];
+              last.stage2 = event.data;
+              last.metadata = event.metadata;
+              last.stage2_tokens = event.tokens;
+              last.loading.stage2 = false;
               return { ...prev, messages };
             });
             break;
@@ -134,8 +135,7 @@ function App() {
           case 'stage3_start':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.loading.stage3 = true;
+              messages[messages.length - 1].loading.stage3 = true;
               return { ...prev, messages };
             });
             break;
@@ -143,20 +143,27 @@ function App() {
           case 'stage3_complete':
             setCurrentConversation((prev) => {
               const messages = [...prev.messages];
-              const lastMsg = messages[messages.length - 1];
-              lastMsg.stage3 = event.data;
-              lastMsg.loading.stage3 = false;
+              const last = messages[messages.length - 1];
+              last.stage3 = event.data;
+              last.stage3_tokens = event.tokens;
+              last.loading.stage3 = false;
+              return { ...prev, messages };
+            });
+            break;
+
+          case 'summary':
+            setCurrentConversation((prev) => {
+              const messages = [...prev.messages];
+              messages[messages.length - 1].summary = event.data;
               return { ...prev, messages };
             });
             break;
 
           case 'title_complete':
-            // Reload conversations to get updated title
             loadConversations();
             break;
 
           case 'complete':
-            // Stream complete, reload conversations list
             loadConversations();
             setIsLoading(false);
             break;
@@ -172,7 +179,6 @@ function App() {
       });
     } catch (error) {
       console.error('Failed to send message:', error);
-      // Remove optimistic messages on error
       setCurrentConversation((prev) => ({
         ...prev,
         messages: prev.messages.slice(0, -2),
@@ -188,12 +194,15 @@ function App() {
         currentConversationId={currentConversationId}
         onSelectConversation={handleSelectConversation}
         onNewConversation={handleNewConversation}
+        onShowLeaderboard={() => setShowLeaderboard(true)}
       />
       <ChatInterface
         conversation={currentConversation}
         onSendMessage={handleSendMessage}
+        onFeedback={handleFeedback}
         isLoading={isLoading}
       />
+      {showLeaderboard && <Leaderboard onClose={() => setShowLeaderboard(false)} />}
     </div>
   );
 }

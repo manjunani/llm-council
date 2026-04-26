@@ -1,0 +1,256 @@
+.council-metrics {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+    border-left: 4px solid #4a90e2;
+}
+
+.metrics-section {
+    margin-bottom: 16px;
+}
+
+.metrics-section:last-child {
+    margin-bottom: 0;
+}
+
+.metrics-section h4 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Cost Section */
+.cost-section {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.cost-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cost-item:last-child {
+    border-bottom: none;
+}
+
+.cost-item.total {
+    font-weight: 600;
+    border-top: 2px solid #4a90e2;
+    padding-top: 8px;
+    margin-top: 4px;
+}
+
+.cost-value {
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: #4a90e2;
+    font-weight: 500;
+}
+
+.cost-total {
+    color: #2ecc71;
+    font-size: 14px;
+}
+
+/* Tokens Section */
+.tokens-section {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.tokens-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.token-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+}
+
+.token-stat .label {
+    font-weight: 600;
+    color: #333;
+}
+
+.token-stat .value {
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: #4a90e2;
+    font-weight: 500;
+}
+
+.token-breakdown {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.stage-label {
+    background: rgba(74, 144, 226, 0.1);
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #4a90e2;
+    font-family: 'Monaco', 'Courier New', monospace;
+}
+
+/* Consensus Section */
+.consensus-section {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.consensus-info {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.confidence-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.confidence-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #333;
+}
+
+.confidence-pct {
+    font-weight: 600;
+    color: #4a90e2;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.consensus-stat {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 6px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.consensus-stat .label {
+    font-weight: 600;
+    color: #333;
+}
+
+.consensus-stat .value {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.dissenting-section {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+.dissenting-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dissenting-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.dissent-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+    padding: 4px 0;
+}
+
+.dissent-model {
+    font-weight: 500;
+    color: #4a90e2;
+}
+
+.dissent-votes {
+    font-family: 'Monaco', 'Courier New', monospace;
+    color: #ff9800;
+}
+
+.full-agreement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(46, 204, 113, 0.1);
+    border-radius: 4px;
+    color: #27ae60;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+.checkmark {
+    font-size: 16px;
+}
+
+.agreement-text {
+    font-weight: 600;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .council-metrics {
+        padding: 16px;
+        margin: 16px 0;
+    }
+
+    .cost-breakdown {
+        font-size: 12px;
+    }
+
+    .token-breakdown {
+        flex-direction: column;
+    }
+
+    .stage-label {
+        flex: 1;
+        text-align: center;
+    }
+}

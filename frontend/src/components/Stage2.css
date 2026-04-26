@@ -20,6 +20,71 @@
   line-height: 1.5;
 }
 
+/* Consensus Summary */
+.consensus-summary {
+  background: linear-gradient(135deg, #e8f4f8 0%, #f0e8f8 100%);
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 20px;
+}
+
+.consensus-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.consensus-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.confidence-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+
+.confidence-badge.confidence-high {
+  background: #2ecc71;
+}
+
+.confidence-badge.confidence-medium {
+  background: #f39c12;
+}
+
+.confidence-badge.confidence-low {
+  background: #e74c3c;
+}
+
+.consensus-details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  color: #555;
+}
+
+.consensus-percentage {
+  font-weight: 500;
+  color: #4a90e2;
+}
+
+.dissent-info {
+  color: #666;
+  font-style: italic;
+}
+
+.full-agreement {
+  color: #27ae60;
+  font-weight: 600;
+}
+
 .aggregate-rankings {
   background: #f0f7ff;
   padding: 16px;
